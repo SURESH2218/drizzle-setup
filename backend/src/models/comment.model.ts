@@ -1,5 +1,5 @@
 // models/comment.model.ts
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { users } from "./user.model";
 import { posts } from "./post.model";
@@ -7,7 +7,7 @@ import { posts } from "./post.model";
 export const comments = pgTable("comments", {
   id: uuid("id").defaultRandom().primaryKey(),
   content: text("content").notNull(),
-  authorId: uuid("author_id")
+  authorId: varchar("author_id", { length: 256 })
     .references(() => users.id)
     .notNull(),
   postId: uuid("post_id")

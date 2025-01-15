@@ -6,21 +6,16 @@ declare global {
       };
       user?: {
         id: string;
-        // Add other user properties types here
       };
     }
   }
 }
 
-import { ClerkExpressRequireAuth } from "@clerk/clerk-sdk-node";
+import { requireAuth, getAuth } from "@clerk/express";
 import { Request, Response, NextFunction } from "express";
 import APIErrorResponse from "../lib/APIErrorResponse.js";
 
-export const requireAuth = ClerkExpressRequireAuth({
-  onError: (error) => {
-    throw new APIErrorResponse(401, "Unauthorized access");
-  },
-});
+export const authMiddleware = requireAuth();
 
 // Add user data to the request
 export const addUserDataToRequest = async (
@@ -29,14 +24,15 @@ export const addUserDataToRequest = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.auth?.userId) {
+    const auth = getAuth(req);
+    if (!auth.userId) {
       throw new APIErrorResponse(401, "Unauthorized access");
     }
-    // Add typed user data to the request
+
     req.user = {
-      id: req.auth.userId,
-      // Add other user properties as needed
+      id: auth.userId,
     };
+    console.log(req.user);
     next();
   } catch (error) {
     next(error);
